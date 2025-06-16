@@ -5,16 +5,31 @@ import { useSelector } from 'react-redux';
 import type { RootState } from './app/store';
 import QuestionScreen from './components/QuestionScreen';
 import ResultScreen from './components/ResultScreen';
+import AddQuestionForm from './components/AddQuestionForm';
 
 function App() {
   const [started, setStarted] = useState(false);
+  const [showForm ,setShowForm] = useState(false);
   const quizEnded = useSelector((state: RootState) => state.quiz.quizEnded);
 
   const handleStart = () => setStarted(true);
+  const toggleForm = () => setShowForm((prev) => !prev);
+
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       {!started ? (
+        <div className= "text-center">
         <StartScreen onStart = {handleStart} />
+        <button
+          onClick={toggleForm}
+          className="mt-6 bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700"
+          >
+            {showForm? 'Close Form' : 'Add Question'}
+          </button>
+            {showForm && <AddQuestionForm onClose = {toggleForm} />}
+          </div>
+        
+        
       ) : quizEnded? (
           <ResultScreen />
       ): (

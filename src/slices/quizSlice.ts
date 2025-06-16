@@ -71,10 +71,13 @@ const quizSlice = createSlice ( {
             state.userAnswers = [];
             state.quizEnded = false;
         },
+        addQuestion (state, action : PayloadAction<Question>) {
+            state.questions.push(action.payload);
+        },
     },
 });
 
-export const { answerQuestion, restartQuiz} = quizSlice.actions;
+export const { answerQuestion, restartQuiz,addQuestion} = quizSlice.actions;
 export default quizSlice.reducer;
 
 
