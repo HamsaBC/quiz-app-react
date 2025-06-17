@@ -2,47 +2,75 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { addQuestion } from '../slices/quizSlice';
 
+import { useFieldArray, useForm } from 'react-hook-form';
+
+
 type AddQuestionFormProps = {
   onClose: () => void;
 };
 
+type FormData = {
+    question: string;
+    options: { value: string} [];
+    correctAnswer: string;
+
+};
+
 const AddQuestionForm: React.FC <AddQuestionFormProps> = ({ onClose }) => {
     const dispatch = useDispatch();
-    const [question, setQuestion] = useState('');
-    const [options,setOptions] = useState(['','','','']);
-    const [correctAnswer,setCorrectAnswer] = useState('');
+   // const [question, setQuestion] = useState('');
+    //const [options,setOptions] = useState(['','','','']);
+    //const [correctAnswer,setCorrectAnswer] = useState('');
     const  [showSuccess, setShowSuccess] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
+    const {
+        register, 
+        handleSubmit,
+        control,
+        reset,
 
-        if (!question || options.some((opt) => !opt) || !correctAnswer) {
-            alert ('Please fill all fields!');
+        formState: { errors } ,
+    } = useForm<FormData>({
+        defaultValues: {
+            question: '',
+            options:[{value: ''},{value: ''},{value:''},{value:''}],
+            correctAnswer: '',
+        },
+    });
+    
+    const { fields } = useFieldArray({
+        control,
+        name: 'options',
+    });
+
+    const onSubmit = (data: FormData) => {
+        const optionsArray = data.options.map(opt => opt.value);
+        if(!optionsArray.includes(data.correctAnswer)) {
+            alert('Correct answer must one of the options!');
             return;
         }
 
-        if(!options.includes(correctAnswer)) {
-            alert('Correct answer must match one of the options!');
-            return;
-        }
+        dispatch(
+            addQuestion({
+                question:data.question,
+                options: optionsArray,
+                correctAnswer:data.correctAnswer,
+            })
+        );
 
-        dispatch(addQuestion({ question, options, correctAnswer}));
-        setQuestion('');
-        setOptions(['','','','']);
-        setCorrectAnswer('');
+        reset();
         setShowSuccess(true);
     };
 
-    useEffect (() => {
+    useEffect(() => {
         if (showSuccess) {
-            const timer = setTimeout (() => {
+            const timer = setTimeout(() => {
                 setShowSuccess(false);
                 onClose();
             }, 2000);
             return () => clearTimeout(timer);
-           }
-        }, [showSuccess, onClose]);
-        
+        }
+    }, [showSuccess,onClose]);
 
     return (
         <div className = "max-w-xl mx-auto mt-8 p-6 bg-white shadow rounded">
@@ -53,36 +81,33 @@ const AddQuestionForm: React.FC <AddQuestionFormProps> = ({ onClose }) => {
                 ✅ Question added Successfully!
                 </div>
             )}
-            <form onSubmit={handleSubmit} className="grid gap-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
                 <input
                     className = "border p-2 rounded"
                     type="text"
                     placeholder="Question"
-                    value={question}
-                    onChange={(e) => setQuestion(e.target.value)}
+                    {...register('question',{required:'Question is required'})}
                     />
-                    {options.map((opt,idx) => (
+                    {errors.question && <span className="text-red-500">{errors.question.message}</span>}
+                    {fields.map((field,idx) => (
                         <input
-                          key = {idx}
+                          key = {field.id}
                           className="border p-2 rounded"
                           type="text"
                           placeholder={`Option ${idx + 1}`}
-                          value = {options[idx]}
-                          onChange={(e) => {
-                            const newOptions = [...options];
-                            newOptions[idx] = e.target.value;
-                            setOptions(newOptions);
-                          }}
+                          {...register(`options.${idx}.value`, {required:'Option is required'})}
                           />
-
+                          
                     ))}
+                    {errors.options && <span className="text-red-500">All options are required</span>}
+
                     <input
                         className="border p-2 rounded"
                         type = "text"
                         placeholder="Correct Answer"
-                        value = {correctAnswer}
-                        onChange={(e) => setCorrectAnswer(e.target.value)}
+                        {...register('correctAnswer',{required:'Correct answer is required'})}
                         />
+                        {errors.correctAnswer && <span className="text-red-500">{errors.correctAnswer.message}</span>}
 
                         {/* <div className="flex gap-2 justify-end">
                             <button
