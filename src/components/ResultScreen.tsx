@@ -16,7 +16,7 @@ const ResultScreen: React.FC = () => {
             <p className="text-lg mb-6"> Your Score: {score} / {questions.length}</p>
 
             <div className="text-left mb-6">
-                {questions.map ((q, idx) => (
+                {questions.map ((q, idx) => (       //q is an first loop for questions 
                     <div key = {idx} className="mb-3 border-b pb-2">
                         <p className="front-semibold"> {q.question}</p>
                         <p>

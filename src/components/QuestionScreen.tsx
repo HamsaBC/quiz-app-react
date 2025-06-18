@@ -5,11 +5,11 @@ import { answerQuestion } from '../slices/quizSlice';
 
 const QuestionScreen : React.FC = () => {
     const dispatch = useDispatch();
-    const quiz = useSelector((state: RootState) => state.quiz);
-    const current = quiz.questions[quiz.currentIndex];
+    const quiz = useSelector((state: RootState) => state.quiz);     // Access the entire quiz state from the Redux store
+    const current = quiz.questions[quiz.currentIndex];        // Get the current question based on the current index
 
-    const handleAnswer = (option: string) => {
-        dispatch(answerQuestion(option));
+    const handleAnswer = (option: string) => {      // Handles user selecting an answer option
+        dispatch(answerQuestion(option));             // Dispatches the answer to the Redux store
     };
     return (
         <div className= "max-w-xl mx-auto mt-12 p-6 bg-White rounded shadow ">
@@ -21,8 +21,8 @@ const QuestionScreen : React.FC = () => {
             <div className="grid gap-3">
                 {current.options.map((opt, idx) => (
                     <button
-                    key={idx}
-                    onClick={() => handleAnswer(opt)}
+                    key={idx}       // Use index as a unique key for each button
+                    onClick={() => handleAnswer(opt)}   // When clicked, dispatch the selected answer
                     className = "bg-blue-100 hover:bg-blue-200 text-blue-800 px-4 py-2 rounded text-left"
                     >
                         {opt}

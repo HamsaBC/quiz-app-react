@@ -6,7 +6,7 @@ type Question = {
     correctAnswer: string;
 };
 
-interface QuizState {
+ export interface QuizState {
     questions: Question[];
     currentIndex: number;
     score: number;
@@ -52,7 +52,7 @@ const quizSlice = createSlice ( {
     name: 'quiz',
     initialState,
     reducers: {
-        answerQuestion(state, action: PayloadAction<string>) {
+        answerQuestion(state, action: PayloadAction<string>) {              // Handles the user's answer to the current question
             const currentQuestion = state.questions[state.currentIndex];
             const isCorrect = action.payload === currentQuestion.correctAnswer;
 
@@ -71,7 +71,7 @@ const quizSlice = createSlice ( {
             state.userAnswers = [];
             state.quizEnded = false;
         },
-        addQuestion (state, action : PayloadAction<Question>) {
+        addQuestion (state, action : PayloadAction<Question>) {             // Adds a new question to the quiz
             state.questions.push(action.payload);
         },
     },
@@ -79,5 +79,6 @@ const quizSlice = createSlice ( {
 
 export const { answerQuestion, restartQuiz,addQuestion} = quizSlice.actions;
 export default quizSlice.reducer;
+
 
 

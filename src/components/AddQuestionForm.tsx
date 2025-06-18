@@ -6,7 +6,7 @@ import { useFieldArray, useForm } from 'react-hook-form';
 
 
 type AddQuestionFormProps = {
-  onClose: () => void;
+  onClose: () => void;         // A function passed as a prop to close or hide the form 
 };
 
 type FormData = {
@@ -24,7 +24,7 @@ const AddQuestionForm: React.FC <AddQuestionFormProps> = ({ onClose }) => {
     const  [showSuccess, setShowSuccess] = useState(false);
 
     const {
-        register, 
+        register,           //register form inputs into React Hook Form
         handleSubmit,
         control,
         reset,
@@ -89,7 +89,7 @@ const AddQuestionForm: React.FC <AddQuestionFormProps> = ({ onClose }) => {
                     {...register('question',{required:'Question is required'})}
                     />
                     {errors.question && <span className="text-red-500">{errors.question.message}</span>}
-                    {fields.map((field,idx) => (
+                    {fields.map((field,idx) => (            //idx:index inital value=0
                         <input
                           key = {field.id}
                           className="border p-2 rounded"
