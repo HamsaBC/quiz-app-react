@@ -1,8 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
 import quizReducer from '../slices/quizSlice';
 import type { QuizState} from '../slices/quizSlice'
+import createSagaMiddleware from 'redux-saga';
+import { quizSaga } from '../sagas/quizSaga';
 
-type PersistedState = {                     // it describe what part we are saving (quiz)
+ type PersistedState = {                     // it describe what part we are saving (quiz)
     quiz: QuizState;
 };
 export const loadState = () : PersistedState | undefined=> {     // Loads the persisted Redux state (quiz data) from localStorage
@@ -26,19 +28,30 @@ export  const saveState = (state : any) => {
     }
 };
 
-export const store = configureStore ({
-    reducer : {
-        quiz: quizReducer,
+
+
+
+//export default store;
+
+const sagaMiddleware = createSagaMiddleware();
+
+export const store = configureStore( {
+    reducer: {
+        quiz:quizReducer,
+          
     },
-    preloadedState:loadState(),
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware({thunk: false}).concat(sagaMiddleware),
+      preloadedState: loadState(),
 });
-// Subscribe to store updates: this function runs every time an action is dispatched
+
+//Subscribe to store updates: this function runs every time an action is dispatched
 store.subscribe(() => {
     saveState({
         quiz: store.getState().quiz,
     });
 });
-
-export default store;
+sagaMiddleware.run(quizSaga);
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
+export default store;
